@@ -15,3 +15,4 @@ def read_dad_data():
             if dat_z == -9999.99:
                 ... #欠損処理.
             data_wrl.append([dat_x, dat_z, -1 * dat_y])
+# comment
