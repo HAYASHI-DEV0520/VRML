@@ -1,4 +1,4 @@
-def read_dad_data():
+def read_dad():
     """
     元データとVRMLでは異なるので、
     X座標はそのまま保持
@@ -12,7 +12,11 @@ def read_dad_data():
             dat_x = point_tmp[0]
             dat_y = point_tmp[1]
             dat_z = point_tmp[2]
-            if dat_z == -9999.99:
-                ... #欠損処理.
             data_wrl.append([dat_x, dat_z, -1 * dat_y])
-# comment
+    return data_wrl
+
+def fill_99():
+    """
+    欠損値(-9999.99)を補完する.
+    """
+    
