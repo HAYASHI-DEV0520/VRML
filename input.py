@@ -1,5 +1,5 @@
 import sys
-
+ 
 def read_dad():
     """
     元データとVRMLでは異なるので、
