@@ -9,7 +9,7 @@ def read_dad():
     """
     data_wrl = []
     
-    with open("53394640_dsm_1m.dat") as f:
+    with open("53394610_dsm_1m.dat") as f:
         for line in f:
             dat_x, dat_y, dat_z = map(float, line.split())
             if dat_z == -9999.99:
