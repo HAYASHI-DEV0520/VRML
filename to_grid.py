@@ -26,9 +26,6 @@ def read_dad():
     return data_wrl
 
 
-
-
-
 def fill_99():
     """
     欠損値(-9999.99)を補完する.
