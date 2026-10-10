@@ -20,7 +20,7 @@ def read_dad():
     for filename in files:
         with open(filename) as f:
             coordinate_parts.append(
-                np.loadtxt(f, usecols=(0, 1), dtype=np.float64, ndmin=2)
+                np.loadtxt(f, usecols=(0, 1, 2), dtype=np.float32, ndmin=2)
             )
 
     points = np.concatenate(coordinate_parts, axis=0)
@@ -81,6 +81,6 @@ grid = np.full(
 # 格子に元の点の番号を格納
 grid[rows, cols] = np.arange(len(rows))
 
-with open("write.dat", "w", encoding="utf-8") as f:
+with open("grid.dat", "w", encoding="utf-8") as f:
     for row in grid:
         f.write(" ".join(map(str, row)) + "\n")
