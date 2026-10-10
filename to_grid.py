@@ -66,7 +66,7 @@ def align_axis(values, eps):
 
 cols, x_grid = align_axis(points[:, 0], EPS_X)
 rows, y_grid = align_axis(points[:, 1], EPS_Y)
-del points
+#del points
 
 print("X方向の列数:", len(x_grid))
 print("Y方向の行数:", len(y_grid))
