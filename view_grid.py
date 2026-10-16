@@ -205,6 +205,35 @@ PAGE = r"""<!doctype html>
     const pointCloud = new THREE.Points(geometry, material);
     terrain.add(pointCloud);
 
+    // 欠損点は有効な四近傍の平均標高(なければ最低標高)に赤で表示する
+    const missingPositions = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const pointId = grid[r * cols + c];
+        if (pointId < 0 || positions[pointId * 3 + 1] >= -10000) continue;
+        let sum = 0;
+        let count = 0;
+        for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+          const nr = r + dr;
+          const nc = c + dc;
+          if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+          const neighborId = grid[nr * cols + nc];
+          if (neighborId < 0) continue;
+          const height = positions[neighborId * 3 + 1];
+          if (height < -10000) continue;
+          sum += height;
+          count++;
+        }
+        missingPositions.push(positions[pointId * 3], count ? sum / count : meta.zMin, positions[pointId * 3 + 2]);
+      }
+    }
+    const missingGeometry = new THREE.BufferGeometry();
+    missingGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(missingPositions), 3));
+    const missingCloud = new THREE.Points(missingGeometry, new THREE.PointsMaterial({ color: 0xff0000, size: 4, sizeAttenuation: false }));
+    missingCloud.renderOrder = 4;
+    missingCloud.frustumCulled = false;
+    terrain.add(missingCloud);
+
     function setDensity(stride) {
       let validOrdinal = 0;
       let drawCount = 0;
