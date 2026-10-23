@@ -1,6 +1,7 @@
 """DSMの点群をドロネー三角形分割し、IndexedFaceSetのVRMLファイルにする.
 
 使い方: python to_vrml.py 出力.wrl 入力1.dat [入力2.dat ...] [--threshold 曲率の閾値m]
+python to_vrml.py out_tovr.wrl 53394640_dsm_1m.dat --threshold 3
 """
 import sys
 

@@ -84,3 +84,12 @@ grid[rows, cols] = np.arange(len(rows))
 with open("grid.dat", "w", encoding="utf-8") as f:
     for row in grid:
         f.write(" ".join(map(str, row)) + "\n")
+
+def reduce_points(points,threshold):
+    """曲率(ラプラシアンの絶対値)が threshold 以上の点と、格子の外周の点だけ残す."""
+    for i in points:
+        
+        corv = #曲率計算.
+        if corv >= threshold:
+            ... #削減
+
