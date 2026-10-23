@@ -18,6 +18,10 @@ def read_points(filenames):
     return np.concatenate(parts, axis=0)
 
 
+#欠損点補完次の関数を参考にしてつくる。
+
+
+
 def fill_missing(points):
     """1m格子とみなし、欠損(-9999.99)と抜けた格子点をラプラス方程式で補間して全点を返す."""
     x0, y0 = points[:, 0].min(), points[:, 1].min()
@@ -54,6 +58,12 @@ def fill_missing(points):
 
     gy, gx = np.mgrid[0:h, 0:w]
     return np.column_stack([gx.ravel() + x0, gy.ravel() + y0, z.ravel()]), n_unknown, (h, w)
+
+
+
+
+
+
 
 
 def reduce_points(points, shape, threshold):
