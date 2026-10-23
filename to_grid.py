@@ -10,7 +10,7 @@ files = [
     "53394631_dsm_1m.dat",
     "53394640_dsm_1m.dat",
     "53394641_dsm_1m.dat",
-]
+]#リストとしてすべてのファイルを読み込んでいる。
 
 
 def read_dad():
@@ -28,7 +28,7 @@ def read_dad():
     return points
 
 
-def fill_99():
+def fill_99():#ここを自分で作る
     """
     欠損値(-9999.99)を補完する.
     """
