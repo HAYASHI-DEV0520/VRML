@@ -28,9 +28,30 @@ def read_dad():
     return points
 
 
-def fill_99():#ここを自分で作る
+def miss_point(grid):#ここを自分で作る＃二次元配列のgridを受け取り、欠損値を補完する関数を作る
     """
     欠損値(-9999.99)を補完する.
+    
+    L = []
+    #欠損点を見つけたら、その点の周囲八つを見て小さい方から見て4番目の値を欠損点の値にする
+
+    #すべての点で欠損点を探す
+    for i in range(len(grid[0])):
+        for j in range(len(grid[1])):
+            if grid[i][j] == -9999.99:
+                #周囲八つの点を見て小さい方から見て4番目の値を欠損点の値にする
+                neighbors = []
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        if x == 0 and y == 0:#自分自身の点は除外する
+                            continue
+                        if i + x >= 0 and i + x < len(grid[0]) and j + y >= 0 and j + y < len(grid[1]):
+                            neighbors.append(grid[i + x][j + y])
+                neighbors.sort()
+                grid[i][j] = neighbors[3]
+    
+
+
     """
 
 try:
