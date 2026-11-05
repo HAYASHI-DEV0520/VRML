@@ -125,3 +125,4 @@ def reduce_points(points,threshold):
 
             if curv >= threshold:
                 keep[grid[i, k]] = True
+    return points[keep]
