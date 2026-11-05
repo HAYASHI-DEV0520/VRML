@@ -88,24 +88,40 @@ with open("grid.dat", "w", encoding="utf-8") as f:
 
 def reduce_points(points,threshold):
     """曲率(ラプラシアンの絶対値)が threshold 以上の点と、格子の外周の点だけ残す."""
-    h = 1 #格子間隔 1 (定数でいいのか?)
-    for i in range(len(x_grid)):
-        if(i == 0 or i == len(x_grid)-1):
-            continue # 角は飛ばす?.
-        for k in range(len(y_grid)):
-            if(k == 0 or k == len(y_grid)-1):
-                continue # 角は飛ばす?.
-            # grid[i][k]に対して
-           
-            z = points[grid[i-1:i+2, k-1:k+2], 2]  # 高さ成分を取得
+    keep = np.zeros(len(points), dtype=bool) #残す点はTrue.
+    dx = 1.0
+    dy = 1.0 #格子間隔 1 (定数でいいのか?)
+    
+    # 外周の点はすべて残す
+    keep[grid[0, :]] = True
+    keep[grid[-1, :]] = True
+    keep[grid[:, 0]] = True
+    keep[grid[:, -1]] = True
 
-            Dxx = (z[2, 1] - 2*z[1, 1] + z[0, 1]) / h**2
-            Dyy = (z[1, 2] - 2*z[1, 1] + z[1, 0]) / h**2
+    for i in range(1, len(y_grid)-1):
+        for k in range(1, len(x_grid)-1):
+            # grid[i, k]からpointsのインデックスを取得し、その点の2列目(Z座標)で曲率計算
+            # iはY方向, kはX方向?
+            Dxx = (
+                points[grid[i, k+1], 2]
+                - 2 * points[grid[i, k], 2]
+                + points[grid[i, k-1], 2]
+            ) / dx**2
+
+            Dyy = (
+                points[grid[i+1, k], 2]
+                - 2 * points[grid[i, k], 2]
+                + points[grid[i-1, k], 2]
+            ) / dy**2
+
             Dxy = (
-                z[2, 2] - z[2, 0]
-                - z[0, 2] + z[0, 0]
-            ) / (4*h**2)
+                points[grid[i+1, k+1], 2]
+                - points[grid[i+1, k-1], 2]
+                - points[grid[i-1, k+1], 2]
+                + points[grid[i-1, k-1], 2]
+            ) / (4 * dx * dy)
 
-            curv = np.sqrt(Dxx**2 + 2*Dxy**2 + Dyy**2)
-            if curv >= threshold: # 閾値以上なら
-                ... #削減
+            curv = np.sqrt(Dxx**2 + 2 * Dxy**2 + Dyy**2)
+
+            if curv >= threshold:
+                keep[grid[i, k]] = True
