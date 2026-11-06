@@ -89,6 +89,7 @@ with open("grid.dat", "w", encoding="utf-8") as f:
 def reduce_points(points,sikii):
     """曲率(ラプラシアンの絶対値)が sikii 以上の点と、格子の外周の点だけ残す."""
     keep = np.zeros(len(points), dtype=bool) #pointsと同じ長さの配列をFalseで初期化,これから残す点はTrueに更新.
+    curvs = np.zeros(len(points))
     dx = 1.0
     dy = 1.0 #格子間隔 1 (定数でいいのか?)
     
@@ -108,14 +109,16 @@ def reduce_points(points,sikii):
 
             Dxy = (points[grid[i+1, k+1], 2] - points[grid[i+1, k-1], 2]- points[grid[i-1, k+1], 2]+ points[grid[i-1, k-1], 2]) / (4 * dx * dy)
 
-            curv = np.sqrt(Dxx**2 + 2 * Dxy**2 + Dyy**2)
-
+            curv = np.sqrt(Dxx**2 + 2 * Dxy**2 + Dyy**2) 
+            curvs[grid[i, k]] = curv
             if curv >= sikii:
                 keep[grid[i, k]] = True #残す点はTrueに更新.
+    print("\n曲率最大", curvs.max())
+    print("曲率最小", curvs.min())
     return points[keep]
 
 before = len(points)
 print("元の点数", before)
-for i in (0.5, 0.7, 0.9):
+for i in (1, 2, 4):
     after = len(reduce_points(points, i))
-    print("sikii = ", i, " 点数: ", after, "削減率", after/before)
+    print("sikii = ", i, " 点数: ", after, "削減率", 1 - after/before)
