@@ -114,6 +114,8 @@ def reduce_points(points,sikii):
                 keep[grid[i, k]] = True #残す点はTrueに更新.
     return points[keep]
 
-print("元の点数", len(points))
+before = len(points)
+print("元の点数", before)
 for i in (0.5, 0.7, 0.9):
-    print("sikii = ", i, " 点数: ", len(reduce_points(points, i)) )
+    after = len(reduce_points(points, i))
+    print("sikii = ", i, " 点数: ", after, "削減率", after/before)
