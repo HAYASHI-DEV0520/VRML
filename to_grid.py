@@ -45,7 +45,8 @@ def miss_point(grid):#ここを自分で作る＃二次元配列のgridを受け
                         if x == 0 and y == 0:#自分自身の点は除外する
                             continue
                         if i + x >= 0 and i + x < len(grid[0]) and j + y >= 0 and j + y < len(grid[1]):
-                            neighbors.append(grid[i + x][j + y])
+                            if grid[i + x][j + y] != -9999.99:
+                                neighbors.append(grid[i + x][j + y])
                 neighbors.sort()
                 grid[i][j] = neighbors[3]
     
