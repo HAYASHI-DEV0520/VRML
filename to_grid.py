@@ -48,7 +48,7 @@ def miss_point(grid):#ここを自分で作る＃二次元配列のgridを受け
                             if grid[i + x][j + y] != -9999.99:
                                 neighbors.append(grid[i + x][j + y])
                 neighbors.sort()
-                grid[i][j] = neighbors[3]
+                grid[i][j] = neighbors[len(neighbors) // 2]#小さい方から見て4番目の値を欠損点の値にする
     
 
 
