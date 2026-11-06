@@ -1,5 +1,5 @@
+import numpy as np
 def zimen(grid):
-    import numpy as np
 
     a=np.array([grid])#全データ入れる
 
