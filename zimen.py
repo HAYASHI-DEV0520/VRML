@@ -24,7 +24,4 @@ def zimen(grid):
             if j<len(grid[i])-1:
                 neightbors.append(grid[i][j+1])
             if any(abs(p[2]-q[2])<2 for q in neightbors):
-                zim=np.vstack((zim,p))
-
-
-            
+                zim=np.append(zim, [p], axis=0)          
