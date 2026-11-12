@@ -121,11 +121,12 @@ def calc_curvs(points):
     """曲率を計算しpointsのインデックス順にcurvsに曲率値を格納 必ず残す点(外周など)は-1を返す."""
     curvs = [-1] * len(points)  #初期値-1は 計算されずに-1だったらその点は残す
     dx = 1.0
-    dy = 1.0
+    dy = 1.0 #格子間隔 1 (定数でいいのか?)
 
     for i in range(1, len(y_grid)-1):
         for k in range(1, len(x_grid)-1):
-
+            # grid[i, k]からpointsのインデックスを取得し、その点の2列目(Z座標)で曲率計算
+            # iはY方向, kはX方向
             Dxx = (points[grid[i, k+1], 2] - 2 * points[grid[i, k], 2] + points[grid[i, k-1], 2]) / dx**2
 
             Dyy = (points[grid[i+1, k], 2] - 2 * points[grid[i, k], 2] + points[grid[i-1, k], 2]) / dy**2
