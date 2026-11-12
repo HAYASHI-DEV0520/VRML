@@ -86,21 +86,20 @@ with open("grid.dat", "w", encoding="utf-8") as f:
     for row in grid:
         f.write(" ".join(map(str, row)) + "\n")
 
+#使わない
 def reduce_points(points,sikii):
-    """曲率(ラプラシアンの絶対値)が sikii 以上の点と、格子の外周の点だけ残す."""
+    
     keep = np.zeros(len(points), dtype=bool) #pointsと同じ長さの配列をFalseで初期化,これから残す点はTrueに更新.
     curvs = np.zeros(len(points))
     dx = 1.0
     dy = 1.0 #格子間隔 1 (定数でいいのか?)
     
-    # 外周の点はすべて残す
-    keep[grid[0, :]] = True
-    keep[grid[-1, :]] = True
-    keep[grid[:, 0]] = True
-    keep[grid[:, -1]] = True
+    
 
-    for i in range(1, len(y_grid)-1):
-        for k in range(1, len(x_grid)-1):
+    for i in range(0, len(y_grid)):
+        for k in range(0, len(x_grid)):
+            if i == 0 or i == (len(y_grid) - 1 or k == 0 or k == (len(x_grid) - 1)):
+                keep[grid[i][k]] = True # 外周の点はすべて残す.
             # grid[i, k]からpointsのインデックスを取得し、その点の2列目(Z座標)で曲率計算
             # iはY方向, kはX方向?
             Dxx = (points[grid[i, k+1], 2] - 2 * points[grid[i, k], 2] + points[grid[i, k-1], 2]) / dx**2
@@ -115,10 +114,57 @@ def reduce_points(points,sikii):
                 keep[grid[i, k]] = True #残す点はTrueに更新.
     print("\n曲率最大", curvs.max())
     print("曲率最小", curvs.min())
+    
     return points[keep]
+
+def calc_curvs(points):
+    """曲率を計算しpointsのインデックス順にcurvsに曲率値を格納 必ず残す点(外周など)は-1を返す."""
+    curvs = [-1] * len(points)  #初期値-1は 計算されずに-1だったらその点は残す
+    dx = 1.0
+    dy = 1.0
+
+    for i in range(1, len(y_grid)-1):
+        for k in range(1, len(x_grid)-1):
+
+            Dxx = (points[grid[i, k+1], 2] - 2 * points[grid[i, k], 2] + points[grid[i, k-1], 2]) / dx**2
+
+            Dyy = (points[grid[i+1, k], 2] - 2 * points[grid[i, k], 2] + points[grid[i-1, k], 2]) / dy**2
+
+            Dxy = (points[grid[i+1, k+1], 2] - points[grid[i+1, k-1], 2] - points[grid[i-1, k+1], 2] + points[grid[i-1, k-1], 2]) / (4 * dx * dy)
+
+            curv = np.sqrt(Dxx**2 + 2 * Dxy**2 + Dyy**2)
+
+            curvs[grid[i, k]] = curv
+
+    print("\n曲率最大", curvs.max())
+    print("曲率最小", curvs.min())
+
+    strs = '\n'.join(map(str,curvs))
+    with open("curvs.txt", 'wt') as f:
+        f.write(strs)
+    return curvs
+def reduce_points2(points, curvs, sikii):
+    """曲率(ラプラシアンの絶対値):curvsが 閾値:sikii 以上の点と、格子の外周の点だけ残す."""
+    reduced_points = []
+
+    for i in range(len(points)):
+        if curvs[i] == -1 or curvs[i] >= sikii:
+            reduced_points.append(points[i])
+
+    return reduced_points
 
 before = len(points)
 print("元の点数", before)
+if (input("ENTERでtxtから読み込み")):
+    curvs = np.array(calc_curvs(points))
+else:
+    with open("curvs.txt", "rt") as f:
+        curvs = [float(line) for line in f.read().splitlines()]
 for i in (1, 2, 4):
-    after = len(reduce_points(points, i))
-    print("sikii = ", i, " 点数: ", after, "削減率", 1 - after/before)
+    after = len(reduce_points2(points, curvs, i))
+
+    print(
+        "sikii =", i,
+        "点数:", after,
+        "削減率:", 1 - after / before
+    )
