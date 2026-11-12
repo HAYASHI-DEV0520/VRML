@@ -137,8 +137,8 @@ def calc_curvs(points):
 
             curvs[grid[i, k]] = curv
 
-    print("\n曲率最大", curvs.max())
-    print("曲率最小", curvs.min())
+    print("\n曲率最大", max(curvs))
+    print("曲率最小", min(curvs))
 
     strs = '\n'.join(map(str,curvs))
     with open("curvs.txt", 'wt') as f:
@@ -158,7 +158,7 @@ before = len(points)
 
 print("元の点数", before)
 if (input("ENTERでtxtから読み込み")):
-    curvs = np.array(calc_curvs(points))
+    curvs = calc_curvs(points)
 else:
     with open("curvs.txt", "rt") as f:
         curvs = [float(line) for line in f.read().splitlines()]
