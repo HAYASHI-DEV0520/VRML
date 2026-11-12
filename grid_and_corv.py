@@ -155,6 +155,7 @@ def reduce_points2(points, curvs, sikii):
     return reduced_points
 
 before = len(points)
+
 print("元の点数", before)
 if (input("ENTERでtxtから読み込み")):
     curvs = np.array(calc_curvs(points))
