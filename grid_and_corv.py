@@ -87,36 +87,7 @@ with open("grid.dat", "w", encoding="utf-8") as f:
     for row in grid:
         f.write(" ".join(map(str, row)) + "\n")
 
-#使わない
-def reduce_points(points,sikii):
-    
-    keep = np.zeros(len(points), dtype=bool) #pointsと同じ長さの配列をFalseで初期化,これから残す点はTrueに更新.
-    curvs = np.zeros(len(points))
-    dx = 1.0
-    dy = 1.0 #格子間隔 1 (定数でいいのか?)
-    
-    
 
-    for i in range(0, len(y_grid)):
-        for k in range(0, len(x_grid)):
-            if i == 0 or i == (len(y_grid) - 1 or k == 0 or k == (len(x_grid) - 1)):
-                keep[grid[i][k]] = True # 外周の点はすべて残す.
-            # grid[i, k]からpointsのインデックスを取得し、その点の2列目(Z座標)で曲率計算
-            # iはY方向, kはX方向?
-            Dxx = (points[grid[i, k+1], 2] - 2 * points[grid[i, k], 2] + points[grid[i, k-1], 2]) / dx**2
-
-            Dyy = (points[grid[i+1, k], 2] - 2 * points[grid[i, k], 2] + points[grid[i-1, k], 2]) / dy**2
-
-            Dxy = (points[grid[i+1, k+1], 2] - points[grid[i+1, k-1], 2]- points[grid[i-1, k+1], 2]+ points[grid[i-1, k-1], 2]) / (4 * dx * dy)
-
-            curv = np.sqrt(Dxx**2 + 2 * Dxy**2 + Dyy**2) 
-            curvs[grid[i, k]] = curv
-            if curv >= sikii:
-                keep[grid[i, k]] = True #残す点はTrueに更新.
-    print("\n曲率最大", curvs.max())
-    print("曲率最小", curvs.min())
-    
-    return points[keep]
 
 def calc_curvs(points):
     """曲率を計算しpointsのインデックス順にcurvsに曲率値を格納 必ず残す点(外周など)は-1を返す."""
