@@ -15,11 +15,12 @@
         seeds=indices[order[:n//4]]
         ground=set(seeds)
 
+        cells={grid[i,j]:(i,j) for i,j in np.argwhere(valid)}
         stack=list(seeds)
         while stack:
             current=stack.pop()
             #現在の点の座標
-            i,j=np.where(grid==current)
+            i,j=cells[current]
             #近傍の点
             neighbors=[(i-1,j),(i+1,j),(i,j-1),(i,j+1)]
             for ni,nj in neighbors:
