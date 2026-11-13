@@ -128,6 +128,8 @@ def calc_curvs(points):
         for k in range(1, len(x_grid)-1):
             # grid[i, k]からpointsのインデックスを取得し、その点の2列目(Z座標)で曲率計算
             # iはY方向, kはX方向
+            if np.any(grid[i-1:i+2, k-1:k+2] < 0):
+                continue
             Dxx = (points[grid[i, k+1], 2] - 2 * points[grid[i, k], 2] + points[grid[i, k-1], 2]) / dx**2
 
             Dyy = (points[grid[i+1, k], 2] - 2 * points[grid[i, k], 2] + points[grid[i-1, k], 2]) / dy**2
