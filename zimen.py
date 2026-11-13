@@ -9,7 +9,7 @@
 
         #1/4を地面に
         n=len(indices)
-        seeds=indices[order:n//4]   
+        seeds=indices[order[:n//4]]
         ground=set(seeds)
 
         stack=list(seeds)
