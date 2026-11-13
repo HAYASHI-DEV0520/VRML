@@ -37,18 +37,18 @@ def miss_point(grid):#ここを自分で作る＃二次元配列のgridを受け
     #すべての点で欠損点を探す
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            if grid[i][j] == -9999.99:
+            if points[grid[i][j], 2] == -9999.99:
                 #周囲八つの点を見て小さい方から見て4番目の値を欠損点の値にする
                 neighbors = []
                 for x in range(-1, 2):
                     for y in range(-1, 2):
                         if x == 0 and y == 0:#自分自身の点は除外する
                             continue
-                        if 0 <= i + x < len(grid) and 0 <= j + y < len(grid[i + x]):
-                            if grid[i + x][j + y] != -9999.99:
-                                neighbors.append(grid[i + x][j + y])
+                        if 0 <= i + x < len(grid) and 0 <= j + y < len(points[grid[i + x], 2]):
+                            if points[grid[i + x][j + y], 2] != -9999.99:
+                                neighbors.append(points[grid[i + x][j + y], 2])
                 neighbors.sort()
-                grid[i][j] = neighbors[(len(neighbors) - 1) // 2]#小さい方から見て4番目の値を欠損点の値にする
+                points[grid[i][j], 2] = neighbors[(len(neighbors) - 1) // 2]#小さい方から見て4番目の値を欠損点の値にする
     
 
 
