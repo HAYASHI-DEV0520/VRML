@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+from scipy.spatial import Delaunay
 
 files = [
     "53394610_dsm_1m.dat",
@@ -163,7 +164,8 @@ else:
     with open("curvs.txt", "rt") as f:
         curvs = [float(line) for line in f.read().splitlines()]
 for i in (1, 2, 4):
-    after = len(reduce_points2(points, curvs, i))
+    reduced_points = reduce_points2(points, curvs, i)
+    after = len(reduced_points)
 
     print(
         "sikii =", i,
