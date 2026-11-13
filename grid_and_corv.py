@@ -29,24 +29,7 @@ def read_dad():
     return points
 
 
-def fill_99():
-    """
-    欠損値(-9999.99)を補完する.
-    """
 
-try:
-    points = read_dad()
-except FileNotFoundError as error:
-    print(f"ファイルが見つかりません: {error.filename}")
-    sys.exit(1)
-
-
-print(len(points))
-
-
-# 調整するパラメータ 同じグループにまとめる許容幅
-EPS_X = 0.3
-EPS_Y = 0.3
 
 #近い値で グループ化
 def align_axis(values, eps):
@@ -127,6 +110,26 @@ def reduce_points2(points, curvs, sikii):
             reduced_points.append(points[i])
 
     return reduced_points
+
+
+def fill_99():
+    """
+    欠損値(-9999.99)を補完する.
+    """
+
+try:
+    points = read_dad()
+except FileNotFoundError as error:
+    print(f"ファイルが見つかりません: {error.filename}")
+    sys.exit(1)
+
+
+print(len(points))
+
+
+# 調整するパラメータ 同じグループにまとめる許容幅
+EPS_X = 0.3
+EPS_Y = 0.3
 
 before = len(points)
 
