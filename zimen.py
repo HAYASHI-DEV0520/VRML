@@ -1,7 +1,10 @@
     import numpy as np
     def zimen(grid,points):
         #有効点を抽出
+        grid=grid.copy()
         valid=grid>=0
+        valid[valid]=points[grid[valid],2]>-9999.0
+        grid[~valid]=-1
         indices=grid[valid]
 
         #z座標を低い順に並べる
