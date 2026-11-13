@@ -161,8 +161,11 @@ print("元の点数", before)
 if (input("ENTERでtxtから読み込み")):
     curvs = calc_curvs(points)
 else:
-    with open("curvs.txt", "rt") as f:
-        curvs = [float(line) for line in f.read().splitlines()]
+    try:
+        with open("curvs.txt", "rt") as f:
+            curvs = [float(line) for line in f.read().splitlines()]
+    except FileNotFoundError:
+        curvs = calc_curvs(points)
 for i in (1, 2, 4):
     reduced_points = reduce_points2(points, curvs, i)
     after = len(reduced_points)
