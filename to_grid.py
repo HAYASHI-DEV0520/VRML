@@ -10,7 +10,7 @@ files = [
     "53394631_dsm_1m.dat",
     "53394640_dsm_1m.dat",
     "53394641_dsm_1m.dat",
-]
+]#リストとしてすべてのファイルを読み込んでいる。
 
 
 def read_dad():
@@ -28,10 +28,30 @@ def read_dad():
     return points
 
 
-def fill_99():
-    """
-    欠損値(-9999.99)を補完する.
-    """
+def miss_point(grid):#ここを自分で作る＃二次元配列のgridを受け取り、欠損値を補完する関数を作る
+    #欠損値(-9999.99)を補完する.
+    
+    L = []
+    #欠損点を見つけたら、その点の周囲八つを見て小さい方から見て4番目の値を欠損点の値にする
+
+    #すべての点で欠損点を探す
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == -9999.99:
+                #周囲八つの点を見て小さい方から見て4番目の値を欠損点の値にする
+                neighbors = []
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        if x == 0 and y == 0:#自分自身の点は除外する
+                            continue
+                        if 0 <= i + x < len(grid) and 0 <= j + y < len(grid[i + x]):
+                            if grid[i + x][j + y] != -9999.99:
+                                neighbors.append(grid[i + x][j + y])
+                neighbors.sort()
+                grid[i][j] = neighbors[(len(neighbors) - 1) // 2]#小さい方から見て4番目の値を欠損点の値にする
+    
+
+
 
 try:
     points = read_dad()
