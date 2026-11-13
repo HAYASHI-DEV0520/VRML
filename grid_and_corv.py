@@ -87,36 +87,6 @@ with open("grid.dat", "w", encoding="utf-8") as f:
     for row in grid:
         f.write(" ".join(map(str, row)) + "\n")
 
-#使わない
-def reduce_points(points,sikii):
-    
-    keep = np.zeros(len(points), dtype=bool) #pointsと同じ長さの配列をFalseで初期化,これから残す点はTrueに更新.
-    curvs = np.zeros(len(points))
-    dx = 1.0
-    dy = 1.0 #格子間隔 1 (定数でいいのか?)
-    
-    
-
-    for i in range(0, len(y_grid)):
-        for k in range(0, len(x_grid)):
-            if i == 0 or i == (len(y_grid) - 1 or k == 0 or k == (len(x_grid) - 1)):
-                keep[grid[i][k]] = True # 外周の点はすべて残す.
-            # grid[i, k]からpointsのインデックスを取得し、その点の2列目(Z座標)で曲率計算
-            # iはY方向, kはX方向?
-            Dxx = (points[grid[i, k+1], 2] - 2 * points[grid[i, k], 2] + points[grid[i, k-1], 2]) / dx**2
-
-            Dyy = (points[grid[i+1, k], 2] - 2 * points[grid[i, k], 2] + points[grid[i-1, k], 2]) / dy**2
-
-            Dxy = (points[grid[i+1, k+1], 2] - points[grid[i+1, k-1], 2]- points[grid[i-1, k+1], 2]+ points[grid[i-1, k-1], 2]) / (4 * dx * dy)
-
-            curv = np.sqrt(Dxx**2 + 2 * Dxy**2 + Dyy**2) 
-            curvs[grid[i, k]] = curv
-            if curv >= sikii:
-                keep[grid[i, k]] = True #残す点はTrueに更新.
-    print("\n曲率最大", curvs.max())
-    print("曲率最小", curvs.min())
-    
-    return points[keep]
 
 def calc_curvs(points):
     """曲率を計算しpointsのインデックス順にcurvsに曲率値を格納 必ず残す点(外周など)は-1を返す."""
@@ -163,12 +133,97 @@ if (input("ENTERでtxtから読み込み")):
 else:
     with open("curvs.txt", "rt") as f:
         curvs = [float(line) for line in f.read().splitlines()]
-for i in (1, 2, 4):
-    reduced_points = reduce_points2(points, curvs, i)
-    after = len(reduced_points)
 
-    print(
-        "sikii =", i,
-        "点数:", after,
-        "削減率:", 1 - after / before
+# 以下に閾値を
+i = 1
+reduced_points = reduce_points2(points, curvs, i)
+after = len(reduced_points)
+
+print(
+    "sikii =", i,
+    "点数:", after,
+    "削減率:", 1 - after / before
     )
+points_to_vrml= np.asarray(reduced_points)
+
+    
+"""
+ここから追加 VRML化の処理
+
+"""
+
+
+def triangulate(points):
+    """XY平面でドロネー三角形分割する."""
+    xy_points = [[p[0], p[1]] for p in points]
+    triangles = Delaunay(xy_points).simplices   #面を構成する３点インデックスの組がtrianglesに.
+    # 三角形の頂点を反時計回りに統一
+    for triangle in triangles:
+        a = points[triangle[0]]
+        b = points[triangle[1]]
+        c = points[triangle[2]]
+
+        cross = (
+            (b[0] - a[0]) * (c[1] - a[1])
+            - (b[1] - a[1]) * (c[0] - a[0])
+        )
+
+        if cross < 0:   #クロス積が負の時は時計回りなのでreverse
+            triangle.reverse()
+
+    return triangles
+
+
+def write_vrml(path, points, triangles):
+    """点群と三角形からVRMLファイルを出力する."""
+
+    # VRMLの座標: x=X, y=Z(高さ), z=-Y
+    vrml_points = np.column_stack([
+        points[:, 0],
+        points[:, 2],
+        points[:, 1]
+    ])
+
+    with open(path, "w") as f:
+        f.write("#VRML V2.0 utf8\n")
+
+        f.write("Shape {\n")
+        f.write(
+            "  appearance Appearance { material Material { "
+            "diffuseColor 1 1 1 ambientIntensity 0.25 "
+            "emissiveColor 0.05 0.05 0.05 } }\n"
+        )
+        f.write("  geometry IndexedFaceSet {\n")
+        f.write("    solid FALSE\n")
+        f.write("    coord Coordinate {\n")
+        f.write("      point [\n")
+
+        for point in vrml_points:
+            line = (
+                str(point[0]) + " " +
+                str(point[1]) + " " +
+                str(point[2]) + ",\n"
+            )
+            f.write(line)
+        f.write("      ]\n")
+        f.write("    }\n")
+        f.write("    coordIndex [\n")
+
+        for triangle in triangles:
+            f.write(
+                str(triangle[0]) + "," +
+                str(triangle[1]) + "," +
+                str(triangle[2]) + ",-1,\n"
+            )
+        f.write("    ]\n")
+        f.write("  }\n")
+        f.write("}\n")
+
+
+triangles = triangulate(points_to_vrml)
+
+print("三角形数:", len(triangles))
+
+write_vrml("sikii_1.wrl", points_to_vrml, triangles)
+
+print("VRML出力: sikii_1.wrl")
