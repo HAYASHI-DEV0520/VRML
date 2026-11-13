@@ -49,34 +49,16 @@ def align_axis(values, eps):
     return indices, centers
 
 
-cols, x_grid = align_axis(points[:, 0], EPS_X)
-rows, y_grid = align_axis(points[:, 1], EPS_Y)
-#del points
-
-print("X方向の列数:", len(x_grid))
-print("Y方向の行数:", len(y_grid))
-
-# 2次元配列を作成（-1は点が存在しない場所）
-grid = np.full(
-    (len(y_grid), len(x_grid)),
-    -1,
-    dtype=int
-)
-
-# 格子に元の点の番号を格納
-grid[rows, cols] = np.arange(len(rows))
-
-with open("grid.dat", "w", encoding="utf-8") as f:
-    for row in grid:
-        f.write(" ".join(map(str, row)) + "\n")
 
 
 
-def calc_curvs(points):
+
+
+def calc_curvs(points, grid):
     """曲率を計算しpointsのインデックス順にcurvsに曲率値を格納 必ず残す点(外周など)は-1を返す."""
     curvs = [-1] * len(points)  #初期値-1は 計算されずに-1だったらその点は残す
     dx = 1.0
-    dy = 1.0 #格子間隔 1 (定数でいいのか?)
+    dy = 1.0 #格子間隔 1 (定数でいいのか?)ß
 
     for i in range(1, len(y_grid)-1):
         for k in range(1, len(x_grid)-1):
@@ -112,10 +94,28 @@ def reduce_points2(points, curvs, sikii):
     return reduced_points
 
 
-def fill_99():
-    """
-    欠損値(-9999.99)を補完する.
-    """
+def miss_point(points, grid):#ここを自分で作る＃二次元配列のgridを受け取り、欠損値を補完する関数を作る
+    #欠損値(-9999.99)を補完する.
+    
+    L = []
+    #欠損点を見つけたら、その点の周囲八つを見て小さい方から見て4番目の値を欠損点の値にする
+
+    #すべての点で欠損点を探す
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if points[grid[i][j], 2] == -9999.99:
+                #周囲八つの点を見て小さい方から見て4番目の値を欠損点の値にする
+                neighbors = []
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        if x == 0 and y == 0:#自分自身の点は除外する
+                            continue
+                        if 0 <= i + x < len(grid) and 0 <= j + y < len(points[grid[i + x], 2]):
+                            if points[grid[i + x][j + y], 2] != -9999.99:
+                                neighbors.append(points[grid[i + x][j + y], 2])
+                neighbors.sort()
+                points[grid[i][j], 2] = neighbors[(len(neighbors) - 1) // 2]#小さい方から見て4番目の値を欠損点の値にする
+    
 
 try:
     points = read_dad()
@@ -131,17 +131,37 @@ print(len(points))
 EPS_X = 0.3
 EPS_Y = 0.3
 
+cols, x_grid = align_axis(points[:, 0], EPS_X)
+rows, y_grid = align_axis(points[:, 1], EPS_Y)
+
+#del points
+
+print("X方向の列数:", len(x_grid))
+print("Y方向の行数:", len(y_grid))
+
+# 2次元配列を作成（-1は点が存在しない場所）
+grid = np.full(
+    (len(y_grid), len(x_grid)),
+    -1,
+    dtype=int
+)
+
+# 格子に元の点の番号を格納
+grid[rows, cols] = np.arange(len(rows))
+
+miss_point(points, grid)
+
 before = len(points)
 
 print("元の点数", before)
 if (input("ENTERでtxtから読み込み")):
-    curvs = calc_curvs(points)
+    curvs = calc_curvs(points, grid)
 else:
     try:
         with open("curvs.txt", "rt") as f:
             curvs = [float(line) for line in f.read().splitlines()]
     except FileNotFoundError:
-        curvs = calc_curvs(points)
+        curvs = calc_curvs(points, grid)
 for i in (1, 2, 4):
     reduced_points = reduce_points2(points, curvs, i)
     after = len(reduced_points)
