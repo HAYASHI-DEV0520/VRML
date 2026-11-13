@@ -1,5 +1,18 @@
 # VRML
 
+## 削減後の点群表示
+
+8つのDSMデータを同じフォルダーに置き、NumPy、SciPy、Plotlyをインストールして実行する。
+
+```sh
+./.venv/bin/python -m pip install numpy scipy plotly
+./.venv/bin/python grid_and_corv.py
+```
+
+入力待ちでEnterを押すと、既存の `curvs.txt` を読み込む。別の文字を入力すると曲率を再計算する。処理後、`reduced_points_1.html`、`reduced_points_2.html`、`reduced_points_4.html` をブラウザーで開くと、各閾値の点群を3D表示できる。
+
+表示は操作しやすいように最大20万点に間引き、タイトルに削減後の総点数と表示点数を示す。元の点群や削減点数は変わらない。
+
 ## 3Dグリッドビューア
 
 `grid.dat`と8つのDSMデータを同じフォルダーに置き、次のコマンドで起動する。

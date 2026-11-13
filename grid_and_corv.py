@@ -94,27 +94,52 @@ def reduce_points2(points, curvs, sikii):
     return reduced_points
 
 
+def export_reduced_points(points, threshold):
+    import plotly.graph_objects as go
+
+    total_points = len(points)
+    step = max(1, (total_points + 199999) // 200000)
+    coordinates = np.asarray(points[::step], dtype=np.float32).reshape(-1, 3)
+    figure = go.Figure(data=go.Scatter3d(
+        x=coordinates[:, 0],
+        y=coordinates[:, 1],
+        z=coordinates[:, 2],
+        mode="markers",
+        marker=dict(size=2, color=coordinates[:, 2], colorscale="Viridis",
+                    colorbar=dict(title="標高")),
+    ))
+    figure.update_layout(
+        title=f"削減後の点（閾値: {threshold}、全{total_points}点中{len(coordinates)}点表示）",
+        scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="標高",
+                   aspectmode="data"),
+    )
+    filename = f"reduced_points_{threshold}.html"
+    figure.write_html(filename)
+    print("HTML出力:", filename)
+
+
 def miss_point(points, grid):#ここを自分で作る＃二次元配列のgridを受け取り、欠損値を補完する関数を作る
     #欠損値(-9999.99)を補完する.
-    
-    L = []
+    missing_value = np.float32(-9999.99)
     #欠損点を見つけたら、その点の周囲八つを見て小さい方から見て4番目の値を欠損点の値にする
 
     #すべての点で欠損点を探す
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            if points[grid[i][j], 2] == -9999.99:
+            if grid[i, j] >= 0 and points[grid[i, j], 2] == missing_value:
                 #周囲八つの点を見て小さい方から見て4番目の値を欠損点の値にする
                 neighbors = []
                 for x in range(-1, 2):
                     for y in range(-1, 2):
                         if x == 0 and y == 0:#自分自身の点は除外する
                             continue
-                        if 0 <= i + x < len(grid) and 0 <= j + y < len(points[grid[i + x], 2]):
-                            if points[grid[i + x][j + y], 2] != -9999.99:
-                                neighbors.append(points[grid[i + x][j + y], 2])
+                        if 0 <= i + x < grid.shape[0] and 0 <= j + y < grid.shape[1]:
+                            neighbor = grid[i + x, j + y]
+                            if neighbor >= 0 and points[neighbor, 2] != missing_value:
+                                neighbors.append(points[neighbor, 2])
                 neighbors.sort()
-                points[grid[i][j], 2] = neighbors[(len(neighbors) - 1) // 2]#小さい方から見て4番目の値を欠損点の値にする
+                if neighbors:
+                    points[grid[i, j], 2] = neighbors[(len(neighbors) - 1) // 2]#小さい方から見て4番目の値を欠損点の値にする
     
 
 try:
@@ -171,3 +196,4 @@ for i in (1, 2, 4):
         "点数:", after,
         "削減率:", 1 - after / before
     )
+    export_reduced_points(reduced_points, i)
