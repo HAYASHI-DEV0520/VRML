@@ -10,7 +10,7 @@ files = [
     "53394631_dsm_1m.dat",
     "53394640_dsm_1m.dat",
     "53394641_dsm_1m.dat",
-]
+]#リストとしてすべてのファイルを読み込んでいる。
 
 
 def read_dad():
@@ -28,10 +28,30 @@ def read_dad():
     return points
 
 
-def fill_99():
-    """
-    欠損値(-9999.99)を補完する.
-    """
+def miss_point(grid):#ここを自分で作る＃二次元配列のgridを受け取り、欠損値を補完する関数を作る
+    #欠損値(-9999.99)を補完する.
+    
+    L = []
+    #欠損点を見つけたら、その点の周囲八つを見て小さい方から見て4番目の値を欠損点の値にする
+
+    #すべての点で欠損点を探す
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if points[grid[i][j], 2] == -9999.99:
+                #周囲八つの点を見て小さい方から見て4番目の値を欠損点の値にする
+                neighbors = []
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        if x == 0 and y == 0:#自分自身の点は除外する
+                            continue
+                        if 0 <= i + x < len(grid) and 0 <= j + y < len(points[grid[i + x], 2]):
+                            if points[grid[i + x][j + y], 2] != -9999.99:
+                                neighbors.append(points[grid[i + x][j + y], 2])
+                neighbors.sort()
+                points[grid[i][j], 2] = neighbors[(len(neighbors) - 1) // 2]#小さい方から見て4番目の値を欠損点の値にする
+    
+
+
 
 try:
     points = read_dad()
@@ -84,12 +104,3 @@ grid[rows, cols] = np.arange(len(rows))
 with open("grid.dat", "w", encoding="utf-8") as f:
     for row in grid:
         f.write(" ".join(map(str, row)) + "\n")
-
-def reduce_points(points,threshold):
-    """曲率(ラプラシアンの絶対値)が threshold 以上の点と、格子の外周の点だけ残す."""
-    for i in points:
-        
-        corv = #曲率計算.
-        if corv >= threshold:
-            ... #削減
-
