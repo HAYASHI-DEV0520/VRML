@@ -28,7 +28,7 @@ def zimen(grid,points):
             neighbor=grid[ni,nj]
             if neighbor==-1:
                 continue
-            dz=abs(points[neighbor,2]-points[current,2])
+            dz=points[neighbor,2]-points[current,2]
             if dz<2 and neighbor not in ground:
                 ground.add(neighbor)
                 stack.append(neighbor)
