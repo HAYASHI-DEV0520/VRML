@@ -1,4 +1,5 @@
 *.dat
+*.wrl
 .venv/
 
 # Byte-compiled / optimized / DLL files
@@ -221,3 +222,5 @@ __marimo__/
 .streamlit/secrets.toml
 curvs.txt
 terrain.wrl
+terrain_4.wrl
+sikii_1.wrl
